@@ -28,22 +28,7 @@ fn main() {
     add_player("C", &mut players);
 
     while players.len() > 1 {
-        let rand_actor_index = rand::random::<usize>() % players.len();
-        let rand_target_index = (rand_actor_index + 1) % players.len();
-        let rand_action_index = rand::random::<usize>() % 2;
-
-        let player_name = players.keys().nth(rand_actor_index).unwrap().clone();
-        let target_name = players.keys().nth(rand_target_index).unwrap().clone();
-
-        let action: PlayerAction = if rand_action_index == 0 {
-            PlayerAction::Attack
-        } else {
-            PlayerAction::Pass
-        };
-
-        // handle_player_action(action, &player_name, &target_name, &mut players);
-
-        // display_scores(&players);
+        
     }
 }
 
@@ -52,11 +37,57 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_add_player() {}
+    fn test_add_player() {
+        let mut players: HashMap<String, Player> = HashMap::new();
+
+        // Test: Spieler hinzufügen
+        add_player("Alice", &mut players);
+        assert!(players.contains_key("Alice"));
+        assert_eq!(players.get("Alice").unwrap().health, 3);
+        assert_eq!(players.get("Alice").unwrap().score, 0);
+
+        // Test: Spieler existiert bereits
+        add_player("Alice", &mut players);
+        assert_eq!(players.len(), 1); // Keine doppelten Einträge
+    }
 
     #[test]
-    fn test_handle_player_action() {}
+    fn test_handle_player_action() {
+        let mut players: HashMap<String, Player> = HashMap::new();
+
+        // Spieler hinzufügen
+        add_player("A", &mut players);
+        add_player("B", &mut players);
+
+        // Test: Angriff
+        handle_player_action(
+            PlayerAction::Attack,
+            "A",
+            "B",
+            &mut players,
+        );
+        assert_eq!(players.get("B").unwrap().health, 2);
+
+        // Test: Pass
+        handle_player_action(PlayerAction::Pass, "A", "", &mut players);
+        assert_eq!(players.get("A").unwrap().health, 3); // Keine Änderung bei Pass
+    }
 
     #[test]
-    fn test_game_end() {}
+    fn test_game_end() {
+        let mut players: HashMap<String, Player> = HashMap::new();
+
+        // Spieler hinzufügen
+        add_player("A", &mut players);
+        add_player("B", &mut players);
+
+        // A eliminiert B
+        attack_player("A", "B", &mut players);
+        attack_player("A", "B", &mut players);
+        attack_player("A", "B", &mut players);
+
+        // Nur A bleibt übrig
+        assert_eq!(players.len(), 1);
+        assert!(players.contains_key("A"));
+    }
 }
