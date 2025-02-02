@@ -79,23 +79,26 @@ fn main() {
     add_player("C", &mut players);
 
     while players.len() > 1 {
-        let rand_actor_index = rand::random::<usize>() % players.len();
-        let rand_target_index = (rand_actor_index + 1) % players.len();
-        let rand_action_index = rand::random::<usize>() % 2;
+        handle_player_action(PlayerAction::Attack, "A", "B", &mut players);
 
-        let player_name = players.keys().nth(rand_actor_index).unwrap().clone();
-        let target_name = players.keys().nth(rand_target_index).unwrap().clone();
+        handle_player_action(PlayerAction::Attack, "A", "C", &mut players);
 
-        let action: PlayerAction = if rand_action_index == 0 {
-            PlayerAction::Attack
-        } else {
-            PlayerAction::Pass
-        };
+        handle_player_action(PlayerAction::Pass, "A", "A", &mut players);
 
-        handle_player_action(action, &player_name, &target_name, &mut players);
-
+        println!("--- Aktueller Status ---");
         display_scores(&players);
     }
+
+     // Gewinner ausgeben
+    if let Some(winner) = players.values().next() {
+        println!(
+            "Das Spiel ist vorbei! Gewinner: {} mit {} Punkten.",
+            winner.name, winner.score
+        );
+    } else {
+        println!("Kein Gewinner. Alle Spieler wurden eliminiert.");
+    }
+
 }
 
 #[cfg(test)]
@@ -126,12 +129,7 @@ mod tests {
         add_player("B", &mut players);
 
         // Test: Angriff
-        handle_player_action(
-            PlayerAction::Attack,
-            "A",
-            "B",
-            &mut players,
-        );
+        handle_player_action(PlayerAction::Attack, "A", "B", &mut players);
         assert_eq!(players.get("B").unwrap().health, 2);
 
         // Test: Pass
