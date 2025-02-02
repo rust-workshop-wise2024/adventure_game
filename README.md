@@ -42,7 +42,7 @@ fn add_player(name: &str, players: &mut HashMap<String, Player>)
 
 ### Aufgabe 3: Spieleraktionen definieren
 Definiere die möglichen Aktionen, die ein Spieler ausführen kann:
-- **Angriff**: Der Spieler greift einen anderen Spieler an.
+- **Attack**: Der Spieler greift einen anderen Spieler an.
 - **Pass**: Der Spieler setzt seine Runde aus.
 
 #### Anforderungen:
