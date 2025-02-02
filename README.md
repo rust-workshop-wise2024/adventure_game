@@ -20,9 +20,9 @@ In diesem Spiel entwickelst du ein einfaches, konsolenbasiertes Spieler- und Ang
 
 ### Aufgabe 1: Spieler-Datenstruktur
 Erstelle eine Datenstruktur, die einen Spieler repräsentiert. Ein Spieler hat:
-- `name`: Der Name des Spielers (String).
-- `health`: Die Anzahl der Herzen des Spielers (i32), initialisiert mit 3.
-- `score`: Die Punkte des Spielers (u32), initialisiert mit 0.
+- `name`: Der Name des Spielers `String`.
+- `health`: Die Anzahl der Herzen des Spielers `i32`.
+- `score`: Die Punkte des Spielers `u32`.
 
 ---
 
@@ -35,7 +35,7 @@ fn add_player(name: &str, players: &mut HashMap<String, Player>)
 ```
 
 #### Anforderungen:
-- Wenn ein Spieler mit dem angegebenen Namen bereits existiert, soll eine Nachricht ausgegeben werden: „Spieler [Name] existiert bereits!“
+- Wenn ein Spieler mit dem angegebenen Namen bereits existiert, soll eine Nachricht ausgegeben werden: `Spieler [Name] existiert bereits!`
 - Andernfalls soll ein neuer Spieler mit 3 Herzen und 0 Punkten hinzugefügt werden.
 
 ---
@@ -62,9 +62,9 @@ fn attack_player(actor_name: &str, target_name: &str, players: &mut HashMap<Stri
 - Der Zielspieler verliert 1 Herz.
 - Wenn die Herzen des Zielspielers auf 0 fallen:
   - Entferne ihn aus der HashMap.
-  - Gib eine Nachricht aus: „[Name] wurde eliminiert!“
+  - Gib eine Nachricht aus: `[Name] wurde eliminiert!`
   - Der Angreifer erhält 1 Punkt.
-- Wenn der Zielspieler nicht existiert, gib eine Nachricht aus: „Zielspieler [Name] existiert nicht.“
+- Wenn der Zielspieler nicht existiert, gib eine Nachricht aus: `Zielspieler [Name] existiert nicht.`
 
 ---
 
@@ -78,7 +78,7 @@ fn handle_player_action(action: PlayerAction, actor_name: &str, players: &mut Ha
 
 #### Anforderungen:
 - **Angriff**: Rufe die Funktion `attack_player` auf, um die Angriffslogik auszuführen.
-- **Pass**: Gib eine Nachricht aus: „[Name] hat diese Runde ausgesetzt.“
+- **Pass**: Gib eine Nachricht aus: `[Name] hat diese Runde ausgesetzt.`
 
 ---
 
