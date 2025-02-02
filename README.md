@@ -77,7 +77,7 @@ fn handle_player_action(action: PlayerAction, actor_name: &str, players: &mut Ha
 ```
 
 #### Anforderungen:
-- **Angriff**: Rufe die Funktion `attack_player` auf, um die Angriffslogik auszuführen.
+- **Attack**: Rufe die Funktion `attack_player` auf, um die Angriffslogik auszuführen.
 - **Pass**: Gib eine Nachricht aus: `[Name] hat diese Runde ausgesetzt.`
 
 ---
