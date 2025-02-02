@@ -96,6 +96,16 @@ fn main() {
 
         display_scores(&players);
     }
+
+    // Gewinner ausgeben
+    if let Some(winner) = players.values().next() {
+        println!(
+            "Das Spiel ist vorbei! Gewinner: {} mit {} Punkten.",
+            winner.name, winner.score
+        );
+    } else {
+        println!("Kein Gewinner. Alle Spieler wurden eliminiert.");
+    }
 }
 
 #[cfg(test)]
@@ -126,12 +136,7 @@ mod tests {
         add_player("B", &mut players);
 
         // Test: Angriff
-        handle_player_action(
-            PlayerAction::Attack,
-            "A",
-            "B",
-            &mut players,
-        );
+        handle_player_action(PlayerAction::Attack, "A", "B", &mut players);
         assert_eq!(players.get("B").unwrap().health, 2);
 
         // Test: Pass
