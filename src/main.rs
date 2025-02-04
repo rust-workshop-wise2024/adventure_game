@@ -1,19 +1,22 @@
 use std::collections::HashMap;
 
+// Definiere die möglichen Aktionen eines Spielers
 enum PlayerAction {
-    Attack,
+    Attack { target: String },
     Pass,
 }
 
+// Struktur für Spieler
 struct Player {
     name: String,
     health: i32,
-    score: i32,
+    score: u32,
 }
 
+// Fügt einen neuen Spieler hinzu
 fn add_player(name: &str, players: &mut HashMap<String, Player>) {
     if players.contains_key(name) {
-        println!("Spieler ${:} existiert bereits!", name);
+        println!("Spieler {} existiert bereits!", name);
     } else {
         players.insert(
             name.to_string(),
@@ -23,28 +26,47 @@ fn add_player(name: &str, players: &mut HashMap<String, Player>) {
                 score: 0,
             },
         );
+        println!("Spieler {} wurde hinzugefügt.", name);
     }
 }
 
+// Verarbeitet die Angriff-Logik
 fn attack_player(actor_name: &str, target_name: &str, players: &mut HashMap<String, Player>) {
-    players.get_mut(target_name).unwrap().health -= 1;
+    if let Some(target) = players.get_mut(target_name) {
+        target.health -= 1;
+        println!(
+            "{} wurde angegriffen! Verlor ein Herz. Verbleibende Herzen: {}",
+            target.name, target.health
+        );
 
-    println!(
-        "Spieler ${:} hat Spieler ${:} angegriffen!",
-        actor_name, target_name
-    );
+        if target.health <= 0 {
+            println!("{} wurde eliminiert!", target.name);
+            players.remove(target_name);
 
-    if players.get(target_name).unwrap().health <= 0 {
-        players.get_mut(actor_name).unwrap().score += 1;
-        println!("Spieler ${:} wurde eliminiert!", target_name);
-        players.remove(target_name);
+            if let Some(actor) = players.get_mut(actor_name) {
+                actor.score += 1;
+                println!("{} erhält einen Punkt. Neuer Punktestand: {}", actor.name, actor.score);
+            }
+        }
+    } else {
+        println!("Zielspieler {} existiert nicht.", target_name);
     }
 }
 
-fn player_pass(actor_name: &str) {
-    println!("Spieler ${:} hat gepasst!", actor_name);
+// Verarbeitet, wenn ein Spieler seine Runde aussetzt
+fn pass_turn(player_name: &str) {
+    println!("{} hat diese Runde ausgesetzt.", player_name);
 }
 
+// Verarbeitet die Spieleraktion
+fn handle_player_action(action: PlayerAction, actor_name: &str, players: &mut HashMap<String, Player>) {
+    match action {
+        PlayerAction::Attack { target } => attack_player(actor_name, &target, players),
+        PlayerAction::Pass => pass_turn(actor_name),
+    }
+}
+
+// Zeigt den aktuellen Punktestand an
 fn display_scores(players: &HashMap<String, Player>) {
     println!("Punktestand:");
     for player in players.values() {
@@ -54,42 +76,39 @@ fn display_scores(players: &HashMap<String, Player>) {
         );
     }
 }
-
-fn handle_player_action(
-    action: PlayerAction,
-    actor_name: &str,
-    target_name: &str,
-    players: &mut HashMap<String, Player>,
-) {
-    match action {
-        PlayerAction::Attack => {
-            attack_player(actor_name, target_name, players);
-        }
-        PlayerAction::Pass => {
-            player_pass(actor_name);
-        }
-    };
-}
-
 fn main() {
     let mut players: HashMap<String, Player> = HashMap::new();
 
+    // Spieler hinzufügen
     add_player("A", &mut players);
     add_player("B", &mut players);
     add_player("C", &mut players);
 
+    // Hauptschleife des Spiels
     while players.len() > 1 {
-        handle_player_action(PlayerAction::Attack, "A", "B", &mut players);
+        handle_player_action(
+            PlayerAction::Attack {
+                target: "B".to_string(),
+            },
+            "A",
+            &mut players,
+        );
 
-        handle_player_action(PlayerAction::Attack, "A", "C", &mut players);
+        handle_player_action(
+            PlayerAction::Attack {
+                target: "C".to_string(),
+            },
+            "A",
+            &mut players,
+        );
 
-        handle_player_action(PlayerAction::Pass, "A", "A", &mut players);
+        handle_player_action(PlayerAction::Pass, "A", &mut players);
 
         println!("--- Aktueller Status ---");
         display_scores(&players);
     }
 
-     // Gewinner ausgeben
+    // Gewinner ausgeben
     if let Some(winner) = players.values().next() {
         println!(
             "Das Spiel ist vorbei! Gewinner: {} mit {} Punkten.",
@@ -98,7 +117,6 @@ fn main() {
     } else {
         println!("Kein Gewinner. Alle Spieler wurden eliminiert.");
     }
-
 }
 
 #[cfg(test)]
@@ -121,6 +139,25 @@ mod tests {
     }
 
     #[test]
+    fn test_attack_player() {
+        let mut players: HashMap<String, Player> = HashMap::new();
+
+        // Spieler hinzufügen
+        add_player("A", &mut players);
+        add_player("B", &mut players);
+
+        // Test: Angriff
+        attack_player("A", "B", &mut players);
+        assert_eq!(players.get("B").unwrap().health, 2);
+
+        // Test: Eliminieren eines Spielers
+        attack_player("A", "B", &mut players);
+        attack_player("A", "B", &mut players); // B verliert alle Herzen
+        assert!(!players.contains_key("B"));
+        assert_eq!(players.get("A").unwrap().score, 1);
+    }
+
+    #[test]
     fn test_handle_player_action() {
         let mut players: HashMap<String, Player> = HashMap::new();
 
@@ -129,11 +166,17 @@ mod tests {
         add_player("B", &mut players);
 
         // Test: Angriff
-        handle_player_action(PlayerAction::Attack, "A", "B", &mut players);
+        handle_player_action(
+            PlayerAction::Attack {
+                target: "B".to_string(),
+            },
+            "A",
+            &mut players,
+        );
         assert_eq!(players.get("B").unwrap().health, 2);
 
         // Test: Pass
-        handle_player_action(PlayerAction::Pass, "A", "", &mut players);
+        handle_player_action(PlayerAction::Pass, "A", &mut players);
         assert_eq!(players.get("A").unwrap().health, 3); // Keine Änderung bei Pass
     }
 
@@ -155,3 +198,4 @@ mod tests {
         assert!(players.contains_key("A"));
     }
 }
+
